@@ -58,6 +58,10 @@
   <button id="regenerate" disabled>Regenerate</button>
   <button id="copyAll" disabled>Copy All</button>
 
+  <p style="margin-top:10px; color:#94a3b8;">
+    Free uses today: <strong><span id="usesToday">0</span>/5</strong>
+  </p>
+
   <h3>Review Analysis</h3>
   <p><strong>Sentiment:</strong> <span id="sentiment"></span></p>
   <p><strong>Issues detected:</strong> <span id="issues"></span></p>
@@ -77,6 +81,31 @@
   <div>
     <pre id="reply3"></pre>
     <button onclick="copyText('reply3')">Copy</button>
+  </div>
+
+  <!-- Upgrade Modal -->
+  <div id="paywall" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); padding:20px;">
+    <div style="max-width:520px; margin:10vh auto; background:#111827; border:1px solid #1f2937; border-radius:16px; padding:18px; color:#e5e7eb;">
+      <h2 style="margin:0 0 8px;">Free limit reached</h2>
+      <p style="margin:0 0 14px; color:#94a3b8;">
+        You’ve used your <strong>5 free replies today</strong>. Upgrade to Pro for unlimited generations.
+      </p>
+
+      <ul style="margin:0 0 14px; color:#94a3b8; padding-left:18px;">
+        <li>Unlimited review replies</li>
+        <li>Brand-specific replies (Business Type + Highlights)</li>
+        <li>Faster improvements + new features</li>
+      </ul>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button id="upgradeBtn">Upgrade (coming next)</button>
+        <button id="closePaywall">Not now</button>
+      </div>
+
+      <p style="margin:12px 0 0; font-size:12px; color:#64748b;">
+        (For now this is a demo paywall — Stripe is the next step.)
+      </p>
+    </div>
   </div>
 
   <script src="app.js"></script>
