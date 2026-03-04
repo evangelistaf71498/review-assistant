@@ -1,68 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Review Assistant</title>
-<link rel="stylesheet" href="style.css">
+  <title>Review Assistant</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <h1>Local Business Review Assistant</h1>
 
-<h1>Local Business Review Assistant</h1>
+  <label>Business Name</label>
+  <input id="businessName">
 
-<label>Business Name</label>
-<input id="businessName">
+  <label>Business Type</label>
+  <select id="businessType">
+    <option value="restaurant">Restaurant</option>
+    <option value="salon">Salon / Barber</option>
+    <option value="hvac">HVAC</option>
+    <option value="plumber">Plumber</option>
+    <option value="dentist">Dentist</option>
+    <option value="gym">Gym / Fitness</option>
+    <option value="retail">Retail Store</option>
+    <option value="other" selected>Other</option>
+  </select>
 
-<label>Platform</label>
-<select id="platform">
-<option>Google</option>
-<option>Yelp</option>
-<option>Facebook</option>
-</select>
+  <label>Key Details to Mention (optional)</label>
+  <input id="highlights" placeholder="e.g., family-owned, same-day service, locally sourced ingredients">
 
-<label>Star Rating</label>
-<select id="stars">
-<option value="5">5</option>
-<option value="4">4</option>
-<option value="3">3</option>
-<option value="2">2</option>
-<option value="1">1</option>
-</select>
+  <label>Platform</label>
+  <select id="platform">
+    <option>Google</option>
+    <option>Yelp</option>
+    <option>Facebook</option>
+  </select>
 
-<label>Tone</label>
-<select id="tone">
-<option value="professional">Professional</option>
-<option value="friendly">Friendly</option>
-<option value="apologetic">Apologetic</option>
-</select>
+  <label>Star Rating</label>
+  <select id="stars">
+    <option value="5">5</option>
+    <option value="4">4</option>
+    <option value="3">3</option>
+    <option value="2">2</option>
+    <option value="1">1</option>
+  </select>
 
-<label>Review</label>
-<textarea id="reviewText"></textarea>
+  <label>Tone</label>
+  <select id="tone">
+    <option value="professional">Professional</option>
+    <option value="friendly">Friendly</option>
+    <option value="apologetic">Apologetic</option>
+  </select>
 
-<br><br>
+  <label>Review</label>
+  <textarea id="reviewText"></textarea>
 
-<button id="generate">Generate Replies</button>
-<h3>Review Analysis</h3>
+  <br><br>
 
-<p><strong>Sentiment:</strong> <span id="sentiment"></span></p>
-<p><strong>Issues detected:</strong> <span id="issues"></span></p>
-<h2>Replies</h2>
+  <button id="generate">Generate Replies</button>
+  <button id="regenerate" disabled>Regenerate</button>
+  <button id="copyAll" disabled>Copy All</button>
 
-<div>
-<pre id="reply1"></pre>
-<button onclick="copyText('reply1')">Copy</button>
-</div>
+  <h3>Review Analysis</h3>
+  <p><strong>Sentiment:</strong> <span id="sentiment"></span></p>
+  <p><strong>Issues detected:</strong> <span id="issues"></span></p>
 
-<div>
-<pre id="reply2"></pre>
-<button onclick="copyText('reply2')">Copy</button>
-</div>
+  <h2>Replies</h2>
 
-<div>
-<pre id="reply3"></pre>
-<button onclick="copyText('reply3')">Copy</button>
-</div>
+  <div>
+    <pre id="reply1"></pre>
+    <button onclick="copyText('reply1')">Copy</button>
+  </div>
 
-<script src="app.js"></script>
+  <div>
+    <pre id="reply2"></pre>
+    <button onclick="copyText('reply2')">Copy</button>
+  </div>
 
+  <div>
+    <pre id="reply3"></pre>
+    <button onclick="copyText('reply3')">Copy</button>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
