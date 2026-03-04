@@ -30,6 +30,8 @@ const upgradeBtn = document.getElementById("upgradeBtn");
 // Paywall config
 // --------------------
 const PAYWALL_LIMIT = 5;
+const WAITLIST_URL =
+  "https://docs.google.com/forms/d/e/1FAIpQLSfF9ctXwcVI1UbsErnSnVy8WZI0IxutoIBkOp3lyQXuO_CxYQ/viewform";
 
 // --------------------
 // Paywall helpers
@@ -50,19 +52,17 @@ function updateUsageUI() {
   const used = getUsesToday();
   if (usesTodayEl) usesTodayEl.innerText = String(used);
 
-  // If they have replies, allow Copy All. Regenerate only when replies exist.
   const hasReplies =
     ((reply1?.innerText || "").trim().length > 0) ||
     ((reply2?.innerText || "").trim().length > 0) ||
     ((reply3?.innerText || "").trim().length > 0);
 
-  // Regenerate is only useful if we have replies AND they haven't hit limit.
   const blocked = used >= PAYWALL_LIMIT;
 
   if (regenBtn) regenBtn.disabled = !hasReplies || blocked;
   if (copyAllBtn) copyAllBtn.disabled = !hasReplies;
 
-  // Keep Generate clickable even if blocked so it can open the modal.
+  // Keep Generate clickable even if blocked so it can open the modal
   if (generateBtn) generateBtn.disabled = false;
 }
 
@@ -92,7 +92,7 @@ if (closePaywallBtn) closePaywallBtn.addEventListener("click", closePaywall);
 
 if (upgradeBtn) {
   upgradeBtn.addEventListener("click", () => {
-    alert("Next step: Stripe checkout + Pro plan. We'll wire this up next.");
+    window.open(WAITLIST_URL, "_blank");
   });
 }
 
@@ -130,7 +130,6 @@ function setLoading(isLoading) {
     if (regenBtn) regenBtn.disabled = true;
     if (copyAllBtn) copyAllBtn.disabled = true;
   } else {
-    // Let updateUsageUI decide the correct enable/disable state
     updateUsageUI();
   }
 }
@@ -181,7 +180,7 @@ async function runGenerate() {
     const next = getUsesToday() + 1;
     setUsesToday(next);
 
-    // Show paywall immediately after the 5th success (clear feedback)
+    // Show paywall immediately after the 5th success
     if (next >= PAYWALL_LIMIT) {
       openPaywall();
     }
