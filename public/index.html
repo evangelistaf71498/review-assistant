@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Review Assistant</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<h1>Local Business Review Assistant</h1>
+
+<label>Business Name</label>
+<input id="businessName">
+
+<label>Platform</label>
+<select id="platform">
+<option>Google</option>
+<option>Yelp</option>
+<option>Facebook</option>
+</select>
+
+<label>Star Rating</label>
+<select id="stars">
+<option value="5">5</option>
+<option value="4">4</option>
+<option value="3">3</option>
+<option value="2">2</option>
+<option value="1">1</option>
+</select>
+
+<label>Tone</label>
+<select id="tone">
+<option value="professional">Professional</option>
+<option value="friendly">Friendly</option>
+<option value="apologetic">Apologetic</option>
+</select>
+
+<label>Review</label>
+<textarea id="reviewText"></textarea>
+
+<br><br>
+
+<button id="generate">Generate Replies</button>
+<h3>Review Analysis</h3>
+
+<p><strong>Sentiment:</strong> <span id="sentiment"></span></p>
+<p><strong>Issues detected:</strong> <span id="issues"></span></p>
+<h2>Replies</h2>
+
+<div>
+<pre id="reply1"></pre>
+<button onclick="copyText('reply1')">Copy</button>
+</div>
+
+<div>
+<pre id="reply2"></pre>
+<button onclick="copyText('reply2')">Copy</button>
+</div>
+
+<div>
+<pre id="reply3"></pre>
+<button onclick="copyText('reply3')">Copy</button>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
