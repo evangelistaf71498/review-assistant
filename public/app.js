@@ -1,3 +1,6 @@
+// --------------------
+// Grab elements
+// --------------------
 const businessName = document.getElementById("businessName");
 const businessType = document.getElementById("businessType");
 const highlights = document.getElementById("highlights");
@@ -17,16 +20,20 @@ const generateBtn = document.getElementById("generate");
 const regenBtn = document.getElementById("regenerate");
 const copyAllBtn = document.getElementById("copyAll");
 
-// --------------------
-// Paywall (5/day)
-// --------------------
-const PAYWALL_LIMIT = 5;
-
+// Paywall elements
 const usesTodayEl = document.getElementById("usesToday");
 const paywallEl = document.getElementById("paywall");
 const closePaywallBtn = document.getElementById("closePaywall");
 const upgradeBtn = document.getElementById("upgradeBtn");
 
+// --------------------
+// Paywall config
+// --------------------
+const PAYWALL_LIMIT = 5;
+
+// --------------------
+// Paywall helpers
+// --------------------
 function todayKey() {
   const d = new Date();
   const y = d.getFullYear();
@@ -39,13 +46,37 @@ function getUsesToday() {
   return Number(localStorage.getItem(todayKey()) || "0");
 }
 
+function updateUsageUI() {
+  const used = getUsesToday();
+  if (usesTodayEl) usesTodayEl.innerText = String(used);
+
+  // If they have replies, allow Copy All. Regenerate only when replies exist.
+  const hasReplies =
+    ((reply1?.innerText || "").trim().length > 0) ||
+    ((reply2?.innerText || "").trim().length > 0) ||
+    ((reply3?.innerText || "").trim().length > 0);
+
+  // Regenerate is only useful if we have replies AND they haven't hit limit.
+  const blocked = used >= PAYWALL_LIMIT;
+
+  if (regenBtn) regenBtn.disabled = !hasReplies || blocked;
+  if (copyAllBtn) copyAllBtn.disabled = !hasReplies;
+
+  // Keep Generate clickable even if blocked so it can open the modal.
+  if (generateBtn) generateBtn.disabled = false;
+}
+
 function setUsesToday(n) {
   localStorage.setItem(todayKey(), String(n));
-  if (usesTodayEl) usesTodayEl.innerText = String(n);
+  updateUsageUI();
 }
 
 function openPaywall() {
-  if (paywallEl) paywallEl.style.display = "block";
+  if (!paywallEl) {
+    alert("Paywall element not found in index.html (missing id='paywall').");
+    return;
+  }
+  paywallEl.style.display = "block";
 }
 
 function closePaywall() {
@@ -56,6 +87,7 @@ function canGenerate() {
   return getUsesToday() < PAYWALL_LIMIT;
 }
 
+// Wire paywall buttons
 if (closePaywallBtn) closePaywallBtn.addEventListener("click", closePaywall);
 
 if (upgradeBtn) {
@@ -64,28 +96,28 @@ if (upgradeBtn) {
   });
 }
 
-// click outside modal closes it
+// click outside the modal to close
 if (paywallEl) {
   paywallEl.addEventListener("click", (e) => {
     if (e.target === paywallEl) closePaywall();
   });
 }
 
-// initialize counter display
+// Initialize counter on load
 setUsesToday(getUsesToday());
 
 // --------------------
-// Helpers
+// General helpers
 // --------------------
 function getFormData() {
   return {
-    businessName: businessName.value.trim(),
+    businessName: (businessName?.value || "").trim(),
     businessType: businessType ? businessType.value : "other",
-    highlights: highlights ? highlights.value.trim() : "",
-    platform: platform.value,
-    stars: Number(stars.value),
-    tone: tone.value,
-    reviewText: reviewText.value.trim(),
+    highlights: (highlights?.value || "").trim(),
+    platform: platform?.value || "Google",
+    stars: Number(stars?.value || 0),
+    tone: tone?.value || "professional",
+    reviewText: (reviewText?.value || "").trim(),
   };
 }
 
@@ -94,27 +126,20 @@ function setLoading(isLoading) {
     reply1.textContent = "Generating...";
     reply2.textContent = "";
     reply3.textContent = "";
-    generateBtn.disabled = true;
-    regenBtn.disabled = true;
-    copyAllBtn.disabled = true;
+    if (generateBtn) generateBtn.disabled = true;
+    if (regenBtn) regenBtn.disabled = true;
+    if (copyAllBtn) copyAllBtn.disabled = true;
   } else {
-    generateBtn.disabled = false;
-    // These should be enabled only if we already have replies
-    const hasReplies =
-      (reply1.innerText || "").trim() ||
-      (reply2.innerText || "").trim() ||
-      (reply3.innerText || "").trim();
-
-    regenBtn.disabled = !hasReplies;
-    copyAllBtn.disabled = !hasReplies;
+    // Let updateUsageUI decide the correct enable/disable state
+    updateUsageUI();
   }
 }
 
 // --------------------
-// Main generate call
+// Main generate
 // --------------------
 async function runGenerate() {
-  // Paywall check first (so we don't waste API calls)
+  // If blocked, show paywall and stop
   if (!canGenerate()) {
     openPaywall();
     return;
@@ -140,24 +165,26 @@ async function runGenerate() {
 
     if (!res.ok) {
       reply1.textContent = "Error: " + (data.error || "Unknown error");
-      sentimentEl.innerText = "";
-      issuesEl.innerText = "";
+      if (sentimentEl) sentimentEl.innerText = "";
+      if (issuesEl) issuesEl.innerText = "";
       return;
     }
 
-    sentimentEl.innerText = data.sentiment || "";
-    issuesEl.innerText = (data.issues || []).join(", ");
+    if (sentimentEl) sentimentEl.innerText = data.sentiment || "";
+    if (issuesEl) issuesEl.innerText = (data.issues || []).join(", ");
 
     reply1.textContent = data.replies?.[0]?.text || "";
     reply2.textContent = data.replies?.[1]?.text || "";
     reply3.textContent = data.replies?.[2]?.text || "";
 
-    // Count usage only on success
-    setUsesToday(getUsesToday() + 1);
+    // Increment usage ONLY after success
+    const next = getUsesToday() + 1;
+    setUsesToday(next);
 
-    // enable extra buttons now that we have content
-    regenBtn.disabled = false;
-    copyAllBtn.disabled = false;
+    // Show paywall immediately after the 5th success (clear feedback)
+    if (next >= PAYWALL_LIMIT) {
+      openPaywall();
+    }
   } catch (err) {
     reply1.textContent = "Error: " + (err?.message || "Request failed");
   } finally {
@@ -168,34 +195,39 @@ async function runGenerate() {
 // --------------------
 // Button wiring
 // --------------------
-generateBtn.addEventListener("click", runGenerate);
-regenBtn.addEventListener("click", runGenerate);
+if (generateBtn) generateBtn.addEventListener("click", runGenerate);
+if (regenBtn) regenBtn.addEventListener("click", runGenerate);
 
-copyAllBtn.addEventListener("click", async () => {
-  const t1 = (reply1.innerText || "").trim();
-  const t2 = (reply2.innerText || "").trim();
-  const t3 = (reply3.innerText || "").trim();
+if (copyAllBtn) {
+  copyAllBtn.addEventListener("click", async () => {
+    const t1 = (reply1?.innerText || "").trim();
+    const t2 = (reply2?.innerText || "").trim();
+    const t3 = (reply3?.innerText || "").trim();
 
-  const combined = [t1, t2, t3].filter(Boolean).join("\n\n---\n\n");
-  if (!combined) {
-    alert("Nothing to copy yet — generate replies first.");
-    return;
-  }
+    const combined = [t1, t2, t3].filter(Boolean).join("\n\n---\n\n");
+    if (!combined) {
+      alert("Nothing to copy yet — generate replies first.");
+      return;
+    }
 
-  await navigator.clipboard.writeText(combined);
-  const old = copyAllBtn.innerText;
-  copyAllBtn.innerText = "Copied!";
-  setTimeout(() => (copyAllBtn.innerText = old), 1200);
-});
+    await navigator.clipboard.writeText(combined);
+    const old = copyAllBtn.innerText;
+    copyAllBtn.innerText = "Copied!";
+    setTimeout(() => (copyAllBtn.innerText = old), 1200);
+  });
+}
 
-// Keep your per-reply Copy buttons working
+// Keep per-reply copy buttons working (onclick in HTML)
 function copyText(id) {
-  const text = document.getElementById(id).innerText;
+  const el = document.getElementById(id);
+  const text = (el?.innerText || "").trim();
+  if (!text) return;
   navigator.clipboard.writeText(text);
   alert("Copied!");
 }
 window.copyText = copyText;
 
-// initial state
+// Initial disable state
 if (regenBtn) regenBtn.disabled = true;
 if (copyAllBtn) copyAllBtn.disabled = true;
+updateUsageUI();
