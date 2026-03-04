@@ -21,7 +21,10 @@ app.post("/api/generate", async (req, res) => {
     const platform = clampText(req.body.platform, 30) || "Google";
     const stars = Number(req.body.stars ?? 0);
     const tone = clampText(req.body.tone, 20) || "professional";
-    const reviewText = clampText(req.body.reviewText, 2000);
+    const businessType = clampText(req.body.businessType, 30) || "other";
+    const highlights = clampText(req.body.highlights, 140);
+
+const reviewText = clampText(req.body.reviewText, 2000);
 
     if (!reviewText.trim()) {
       return res.status(400).json({ error: "Please paste a review." });
@@ -44,11 +47,32 @@ replies (array of exactly 3 objects: {label, text}).
 `;
 
     const user = `
+const user = `
 Business: ${businessName}
+Business type: ${businessType}
 Platform: ${platform}
 Star rating: ${stars}
 Preferred tone: ${tone}
+Key details to mention (if relevant): ${highlights || "none"}
 
+Customer review:
+"""
+${reviewText}
+"""
+
+Return 3 reply options:
+1) Short public reply (platform-safe)
+2) Warm public reply (platform-safe)
+3) Private follow-up message to the customer (NOT public; for email/text)
+
+If stars <= 3 OR sentiment is negative, make option 3 an apology + invite to contact + make-it-right tone.
+If stars >= 4, make option 3 a short “thanks + ask for referrals/return visit” private note.
+
+Extra guidance:
+- If the review is negative, apologize and invite them to contact us privately.
+- If the review is positive, thank them and reinforce one key detail (if provided).
+- Do not invent policies, discounts, or specific compensation.
+`;
 Customer review:
 """
 ${reviewText}
@@ -94,16 +118,9 @@ Return 3 reply options:
 
     res.json(data);
   } catch (err) {
-  console.error("OPENAI ERROR:", err?.status, err?.message);
-  console.error(err?.response?.data || err);
-
-  const msg =
-    err?.response?.data?.error?.message ||
-    err?.message ||
-    "Unknown error";
-
-  res.status(err?.status || 500).json({ error: msg });
-}
+    console.error(err);
+    res.status(500).json({ error: "Server error. Check terminal logs." });
+  }
 });
 
 const port = process.env.PORT || 3000;
