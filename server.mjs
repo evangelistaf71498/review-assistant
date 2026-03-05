@@ -1,8 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
 import OpenAI from "openai";
+import Stripe from "stripe";
 
 dotenv.config();
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
@@ -147,6 +150,49 @@ Keep each reply concise and natural.
     res.status(500).json({ error: "Server error. Check terminal logs." });
   }
 });
+app.post("/create-checkout-session", async (req, res) => {
+  try {
 
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "subscription",
+      line_items: [
+        {
+          price: "price_1T7c2FQbd3Ul0pdfYPtGLpnh",
+          quantity: 1,
+        },
+      ],
+      success_url: "https://review-assistant-q0cb.onrender.com/?success=true",
+      cancel_url: "https://review-assistant-q0cb.onrender.com/?canceled=true",
+    });
+
+    res.json({ url: session.url });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Stripe session failed" });
+  }
+});
 const port = process.env.PORT || 3000;
+
+app.post("/create-checkout-session", async (req, res) => {
+  try {
+    const priceId = process.env.STRIPE_PRICE_ID;
+    if (!priceId) return res.status(500).json({ error: "Missing STRIPE_PRICE_ID" });
+
+    const baseUrl = process.env.BASE_URL || "https://review-assistant-q0cb.onrender.com";
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${baseUrl}/?success=true`,
+      cancel_url: `${baseUrl}/?canceled=true`,
+    });
+
+    res.json({ url: session.url });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Stripe session failed" });
+  }
+});
 app.listen(port, () => console.log(`Running on http://localhost:${port}`));
