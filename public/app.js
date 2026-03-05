@@ -50,7 +50,9 @@ function getUsesToday() {
 
 function updateUsageUI() {
   const used = getUsesToday();
-  if (usesTodayEl) usesTodayEl.innerText = String(used);
+  if (usesTodayEl) usesTodayEl.innerText = `${used} (remaining ${remaining})`;
+
+  const remaining = PAYWALL_LIMIT - used;
 
   const hasReplies =
     ((reply1?.innerText || "").trim().length > 0) ||
