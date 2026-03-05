@@ -5,19 +5,24 @@ import Stripe from "stripe";
 
 dotenv.config();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// --------------------
+// Helpers
+// --------------------
 function clampText(s, max = 2000) {
   if (s === undefined || s === null) return "";
   return String(s).slice(0, max);
 }
 
+// --------------------
+// AI: Generate replies
+// --------------------
 app.post("/api/generate", async (req, res) => {
   try {
     const businessName = clampText(req.body.businessName, 80) || "our business";
@@ -93,7 +98,6 @@ Keep each reply concise and natural.
     try {
       data = JSON.parse(text);
     } catch {
-      // Fallback if model returns non-JSON for any reason
       data = {
         sentiment: "neutral",
         issues: [],
@@ -144,43 +148,25 @@ Keep each reply concise and natural.
       });
     }
 
-    res.json(data);
+    return res.json(data);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Server error. Check terminal logs." });
+    console.error("OpenAI error:", err?.message || err);
+    return res.status(500).json({ error: "Server error. Check terminal logs." });
   }
 });
-app.post("/create-checkout-session", async (req, res) => {
-  try {
 
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      mode: "subscription",
-      line_items: [
-        {
-          price: "price_1T7c2FQbd3Ul0pdfYPtGLpnh",
-          quantity: 1,
-        },
-      ],
-      success_url: "https://review-assistant-q0cb.onrender.com/?success=true",
-      cancel_url: "https://review-assistant-q0cb.onrender.com/?canceled=true",
-    });
-
-    res.json({ url: session.url });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Stripe session failed" });
-  }
-});
-const port = process.env.PORT || 3000;
-
+// --------------------
+// Stripe: Create checkout session
+// --------------------
 app.post("/create-checkout-session", async (req, res) => {
   try {
     const priceId = process.env.STRIPE_PRICE_ID;
-    if (!priceId) return res.status(500).json({ error: "Missing STRIPE_PRICE_ID" });
+    if (!priceId) {
+      return res.status(500).json({ error: "Missing STRIPE_PRICE_ID" });
+    }
 
-    const baseUrl = process.env.BASE_URL || "https://review-assistant-q0cb.onrender.com";
+    const baseUrl =
+      process.env.BASE_URL || "https://review-assistant-q0cb.onrender.com";
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
@@ -189,9 +175,21 @@ app.post("/create-checkout-session", async (req, res) => {
       cancel_url: `${baseUrl}/?canceled=true`,
     });
 
-    res.json({ url: session.url });
- } catch (err) {
-  console.error("Stripe error:", err?.type, err?.message, err?.code, err?.raw?.message);
-  res.status(500).json({ error: err?.message || "Stripe session failed" });
+    return res.json({ url: session.url });
+  } catch (err) {
+    console.error(
+      "Stripe error:",
+      err?.type,
+      err?.message,
+      err?.code,
+      err?.raw?.message
+    );
+    return res.status(500).json({ error: err?.message || "Stripe session failed" });
+  }
 });
+
+// --------------------
+// Start server
+// --------------------
+const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Running on http://localhost:${port}`));
