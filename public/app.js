@@ -244,13 +244,3 @@ if (regenBtn) regenBtn.disabled = true;
 if (copyAllBtn) copyAllBtn.disabled = true;
 updateUsageUI();
 
-const resetBtn = document.getElementById("resetUses");
-
-if (resetBtn) {
-  resetBtn.addEventListener("click", () => {
-    localStorage.clear();
-    setUsesToday(0);
-    closePaywall();
-    alert("Counter reset.");
-  });
-}
