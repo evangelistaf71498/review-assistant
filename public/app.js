@@ -50,9 +50,9 @@ function getUsesToday() {
 
 function updateUsageUI() {
   const used = getUsesToday();
-  if (usesTodayEl) usesTodayEl.innerText = `${used} (remaining ${remaining})`;
-
   const remaining = PAYWALL_LIMIT - used;
+
+  if (usesTodayEl) usesTodayEl.innerText = `${used} (remaining ${remaining})`;
 
   const hasReplies =
     ((reply1?.innerText || "").trim().length > 0) ||
@@ -64,9 +64,9 @@ function updateUsageUI() {
   if (regenBtn) regenBtn.disabled = !hasReplies || blocked;
   if (copyAllBtn) copyAllBtn.disabled = !hasReplies;
 
-  // Keep Generate clickable even if blocked so it can open the modal
   if (generateBtn) generateBtn.disabled = false;
 }
+
 
 function setUsesToday(n) {
   localStorage.setItem(todayKey(), String(n));
