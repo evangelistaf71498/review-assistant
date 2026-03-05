@@ -94,15 +94,19 @@ if (closePaywallBtn) closePaywallBtn.addEventListener("click", closePaywall);
 
 if (upgradeBtn) {
   upgradeBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/create-checkout-session", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
 
-    const res = await fetch("/create-checkout-session", {
-      method: "POST"
-    });
+      if (!res.ok || !data.url) {
+        alert("Stripe error: " + (data.error || "No checkout URL returned"));
+        return;
+      }
 
-    const data = await res.json();
-
-    window.location.href = data.url;
-
+      window.location.href = data.url;
+    } catch (err) {
+      alert("Stripe error: " + (err?.message || "Request failed"));
+    }
   });
 }
 // click outside the modal to close
