@@ -91,9 +91,12 @@ function canGenerate() {
 if (closePaywallBtn) closePaywallBtn.addEventListener("click", closePaywall);
 
 if (upgradeBtn) {
-  upgradeBtn.addEventListener("click", () => {
-    window.open(WAITLIST_URL, "_blank");
-  });
+ upgradeBtn.addEventListener("click", () => {
+  window.open(
+    "https://docs.google.com/forms/d/e/1FAIpQLSfF9ctXwcVI1UbsErnSnVy8WZI0IxutoIBkOp3lyQXuO_CxYQ/viewform",
+    "_blank"
+  );
+});
 }
 
 // click outside the modal to close
