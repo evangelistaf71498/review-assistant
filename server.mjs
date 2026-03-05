@@ -52,6 +52,8 @@ Star rating: ${stars}
 Preferred tone: ${tone}
 Key details to mention (if relevant): ${highlights || "none"}
 
+Use the business type and highlights naturally in replies when relevant.
+
 Customer review:
 """
 ${reviewText}
