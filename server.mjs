@@ -190,9 +190,8 @@ app.post("/create-checkout-session", async (req, res) => {
     });
 
     res.json({ url: session.url });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Stripe session failed" });
-  }
+ } catch (err) {
+  console.error("Stripe error:", err?.type, err?.message, err?.code, err?.raw?.message);
+  res.status(500).json({ error: err?.message || "Stripe session failed" });
 });
 app.listen(port, () => console.log(`Running on http://localhost:${port}`));
