@@ -93,14 +93,18 @@ function canGenerate() {
 if (closePaywallBtn) closePaywallBtn.addEventListener("click", closePaywall);
 
 if (upgradeBtn) {
- upgradeBtn.addEventListener("click", () => {
-  window.open(
-    "https://docs.google.com/forms/d/e/1FAIpQLSfF9ctXwcVI1UbsErnSnVy8WZI0IxutoIBkOp3lyQXuO_CxYQ/viewform",
-    "_blank"
-  );
-});
-}
+  upgradeBtn.addEventListener("click", async () => {
 
+    const res = await fetch("/create-checkout-session", {
+      method: "POST"
+    });
+
+    const data = await res.json();
+
+    window.location.href = data.url;
+
+  });
+}
 // click outside the modal to close
 if (paywallEl) {
   paywallEl.addEventListener("click", (e) => {
