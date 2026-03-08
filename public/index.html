@@ -9,9 +9,19 @@
   <h1>Local Business Review Assistant</h1>
 
   <p style="margin-top:8px; color:#94a3b8;">
-Generate professional replies to Google, Yelp, and Facebook reviews in seconds.  
-Try 5 free replies total.
-</p>
+    Generate professional replies to Google, Yelp, and Facebook reviews in seconds.<br>
+    Try 5 free replies total.
+  </p>
+
+  <p style="color:#94a3b8; font-size:14px; margin-top:8px;">
+    1. Paste a customer review<br>
+    2. Click Generate<br>
+    3. Copy a reply in seconds
+  </p>
+
+  <p style="color:#94a3b8; font-size:14px; margin-top:8px;">
+    Works for Google, Yelp, and Facebook reviews.
+  </p>
 
   <label>Business Name</label>
   <input id="businessName">
@@ -55,11 +65,11 @@ Try 5 free replies total.
   </select>
 
   <label>Review</label>
-  <textarea id="reviewText"></textarea>
+  <textarea id="reviewText" placeholder="Example: The food was great but the service was slow and the wait was long."></textarea>
 
   <br><br>
 
-  <button id="generate">Generate Replies</button>
+  <button id="generate">Generate AI Replies</button>
   <button id="regenerate" disabled>Regenerate</button>
   <button id="copyAll" disabled>Copy All</button>
 
@@ -71,14 +81,16 @@ Try 5 free replies total.
   <p><strong>Sentiment:</strong> <span id="sentiment"></span></p>
   <p><strong>Issues detected:</strong> <span id="issues"></span></p>
 
-  <h2>Replies</h2>
+  <h2 style="margin-top:30px;">AI Generated Replies</h2>
 
   <div>
+    <h3>Option 1</h3>
     <pre id="reply1"></pre>
     <button onclick="copyText('reply1')">Copy</button>
   </div>
 
   <div>
+    <h3>Option 2</h3>
     <pre id="reply2"></pre>
     <button onclick="copyText('reply2')">Copy</button>
   </div>
@@ -92,9 +104,9 @@ Try 5 free replies total.
   <!-- Upgrade Modal -->
   <div id="paywall" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); padding:20px;">
     <div style="max-width:520px; margin:10vh auto; background:#111827; border:1px solid #1f2937; border-radius:16px; padding:18px; color:#e5e7eb;">
-      <h2 style="margin:0 0 8px;">Free limit reached</h2>
+      <h2 style="margin:0 0 8px;">You’ve used your 5 free replies</h2>
       <p style="margin:0 0 14px; color:#94a3b8;">
-        You’ve used your <strong>5 free replies</strong>. Upgrade to Pro for unlimited generations.
+        Upgrade to Pro to unlock unlimited review responses.
       </p>
 
       <ul style="margin:0 0 14px; color:#94a3b8; padding-left:18px;">
@@ -104,12 +116,12 @@ Try 5 free replies total.
       </ul>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button id="upgradeBtn">Upgrade</button>
+        <button id="upgradeBtn">Upgrade to Pro</button>
         <button id="closePaywall">Not now</button>
       </div>
 
       <p style="margin:12px 0 0; font-size:12px; color:#64748b;">
-        Upgrade to unlock unlimited replies.
+        Unlock unlimited replies for your business.
       </p>
     </div>
   </div>
