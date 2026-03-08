@@ -1,3 +1,4 @@
+
 // --------------------
 // Grab elements
 // --------------------
@@ -36,23 +37,18 @@ const WAITLIST_URL =
 // --------------------
 // Paywall helpers
 // --------------------
-function todayKey() {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `uses_${y}-${m}-${day}`;
+function usageKey() {
+  return "total_uses";
 }
 
-function getUsesToday() {
-  return Number(localStorage.getItem(todayKey()) || "0");
+function getUsesTotal() {
+  return Number(localStorage.getItem(usageKey()) || "0");
 }
 
 function updateUsageUI() {
-  const used = getUsesToday();
-  const remaining = PAYWALL_LIMIT - used;
+  const used = getUsesTotal();
 
-  if (usesTodayEl) usesTodayEl.innerText = `${used} (remaining ${remaining})`;
+  if (usesTodayEl) usesTodayEl.innerText = used;
 
   const hasReplies =
     ((reply1?.innerText || "").trim().length > 0) ||
@@ -63,13 +59,11 @@ function updateUsageUI() {
 
   if (regenBtn) regenBtn.disabled = !hasReplies || blocked;
   if (copyAllBtn) copyAllBtn.disabled = !hasReplies;
-
-  if (generateBtn) generateBtn.disabled = false;
+  if (generateBtn) generateBtn.disabled = blocked;
 }
 
-
-function setUsesToday(n) {
-  localStorage.setItem(todayKey(), String(n));
+function setUsesTotal(n) {
+  localStorage.setItem(usageKey(), String(n));
   updateUsageUI();
 }
 
@@ -86,7 +80,7 @@ function closePaywall() {
 }
 
 function canGenerate() {
-  return getUsesToday() < PAYWALL_LIMIT;
+  return getUsesTotal() < PAYWALL_LIMIT;
 }
 
 // Wire paywall buttons
@@ -109,6 +103,7 @@ if (upgradeBtn) {
     }
   });
 }
+
 // click outside the modal to close
 if (paywallEl) {
   paywallEl.addEventListener("click", (e) => {
@@ -117,7 +112,7 @@ if (paywallEl) {
 }
 
 // Initialize counter on load
-setUsesToday(getUsesToday());
+setUsesTotal(getUsesTotal());
 
 // --------------------
 // General helpers
@@ -190,10 +185,10 @@ async function runGenerate() {
     reply3.textContent = data.replies?.[2]?.text || "";
 
     // Increment usage ONLY after success
-    const next = getUsesToday() + 1;
-    setUsesToday(next);
+    const next = getUsesTotal() + 1;
+    setUsesTotal(next);
 
-    // Show paywall immediately after the 5th success
+    // Show paywall immediately after the 5th lifetime success
     if (next >= PAYWALL_LIMIT) {
       openPaywall();
     }
@@ -243,4 +238,3 @@ window.copyText = copyText;
 if (regenBtn) regenBtn.disabled = true;
 if (copyAllBtn) copyAllBtn.disabled = true;
 updateUsageUI();
-
